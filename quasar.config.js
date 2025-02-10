@@ -9,7 +9,8 @@ export default defineConfig((/* ctx */) => {
     // preFetch: true,
 
     // app boot file (/src/boot)
-    // --> boot files are part of "main.js"
+    // --> boot files are part of "m
+    // ain.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
       'axios'
@@ -59,7 +60,7 @@ export default defineConfig((/* ctx */) => {
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
-      
+
       vitePlugins: [
         ['vite-plugin-checker', {
           eslint: {

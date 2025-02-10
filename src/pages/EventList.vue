@@ -1,5 +1,9 @@
 <template>
-  <q-page-container>
+
+<div>
+
+  <q-btn label="新增活動" color="primary" @click="addEvent" />
+
     <q-table
       title="演唱會列表"
       :rows="event"
@@ -14,13 +18,16 @@
         </q-td>
       </template>
     </q-table>
-  </q-page-container>
+
+
+  </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../boot/axios';
-
+import { useRouter } from 'vue-router';
 const columns = [
   { name: 'eventId', label: 'ID', field: 'eventId', align: 'left', sortable: true },
   { name: 'eventName', label: '活動名稱', field: 'eventName', align: 'left', sortable: true },
@@ -30,17 +37,26 @@ const columns = [
   { name: 'eventTicketPic', label: '票圖', field: 'eventTicketPic', align: 'center' }
 ];
 
+const router = useRouter();
 const event = ref([]);
+const loading = ref(false);
 
 const fetchEventList = async () => {
   try {
-    const response = await api.get('/event/eventpic')
-    event.value = response.data.data
+    const {data} = await api.get('/event/eventpic')
+    event.value = data.data
     console.log("回傳資料",event.value);
 
   } catch (error) {
     console.error("API 錯誤:", error);
+  } finally {
+    loading.value = false;
   }
+}
+
+const addEvent = () => {
+  console.log("新增活動");
+  router.push('/addEvent');
 }
 
 onMounted(()=>{
