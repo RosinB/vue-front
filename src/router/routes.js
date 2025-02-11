@@ -32,6 +32,11 @@ const routes = [
     path: '/register',
     component: () => import('../pages//UserRegister.vue'),
   },
+  {
+    name:"使用者管理",
+    path: '/user/manage',
+    component: () => import('../pages/UserManage.vue'),
+  }
 ]
 
 export default routes
