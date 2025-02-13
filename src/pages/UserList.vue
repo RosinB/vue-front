@@ -199,10 +199,11 @@ const loading = ref(false)
 
 // 獲取使用者列表
 const fetchUsers = async () => {
+  console.log('fetchUsers triggered', new Error().stack)
   loading.value = true
   try {
     const { data } = await api.get('/users/all')
-    users.value = data.data
+    users.value = [...data.data]
   } catch (error) {
     console.error('獲取使用者列表失敗:', error)
   } finally {
@@ -213,10 +214,31 @@ const fetchUsers = async () => {
 
 
 // 編輯
-const { editUserData, isEditDialogOpen, openEdit, saveEditUser, deleteUser } = useUserEdit(fetchUsers)
-// 搜尋
-const { searchType, searchKeyword, dateRange, searchOptions, getSearchPlaceholder, handleSearch, handleDateSearch, isAdvancedSearch, advancedSearchForm, verifiedOptions, resetAdvancedSearch, handleAdvancedSearch } = useUserSearch(fetchUsers, users, loading)
+const {
+  searchType,
+  searchKeyword,
+  dateRange,
+  searchOptions,
+  getSearchPlaceholder,
+  handleSearch,
+  handleDateSearch,
+  isAdvancedSearch,
+  advancedSearchForm,
+  verifiedOptions,
+  resetAdvancedSearch,
+  handleAdvancedSearch
+} = useUserSearch(users, loading, fetchUsers)
 
+// 編輯相關
+const {
+  editUserData,
+  isEditDialogOpen,
+  openEdit,
+  saveEditUser,
+  deleteUser
+} = useUserEdit(() => {
+  return fetchUsers()
+})
 onMounted(fetchUsers)
 </script>
 

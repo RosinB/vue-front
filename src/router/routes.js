@@ -36,7 +36,12 @@ const routes = [
     name:"使用者管理",
     path: '/user/manage',
     component: () => import('../pages/UserManage.vue'),
-  }
+  },
+  {
+    name: '登入',
+    path: '/login',
+    component: () => import('../pages/LoginUser.vue'),
+  },
 ]
 
 export default routes

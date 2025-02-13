@@ -4,31 +4,19 @@
 
       <template v-slot:body-cell-picEventList="props">
         <q-td :props="props">
-          <q-img
-            :src="props.row.picEventList"
-            style="height: 100px; max-width: 150px"
-            fit="contain"
-          />
+          <q-img :src="props.row.picEventList" style="height: 100px; max-width: 150px" fit="contain" />
         </q-td>
       </template>
 
       <template v-slot:body-cell-picEventSection="props">
         <q-td :props="props">
-          <q-img
-            :src="props.row.picEventSection"
-            style="height: 100px; max-width: 150px"
-            fit="contain"
-          />
+          <q-img :src="props.row.picEventSection" style="height: 100px; max-width: 150px" fit="contain" />
         </q-td>
       </template>
 
       <template v-slot:body-cell-picEventTicket="props">
         <q-td :props="props">
-          <q-img
-            :src="props.row.picEventTicket"
-            style="height: 100px; max-width: 150px"
-            fit="contain"
-          />
+          <q-img :src="props.row.picEventTicket" style="height: 100px; max-width: 150px" fit="contain" />
         </q-td>
       </template>
     </q-table>
@@ -38,7 +26,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../boot/axios'
-
 const picList = ref([])
 const columns = ref([
   {
