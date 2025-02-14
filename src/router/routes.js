@@ -1,4 +1,3 @@
-
 const routes = [
   {
     name: '活動頁面',
@@ -9,7 +8,6 @@ const routes = [
         name: '圖片列表',
         path: '/image',
         component: () => import('../pages/PicList.vue'),
-
       },
       {
         name: '活動列表',
@@ -27,13 +25,17 @@ const routes = [
     name: '使用者列表',
     path: '/user/all',
     component: () => import('../pages/UserList.vue'),
-  },
-  { name:'註冊',
-    path: '/register',
-    component: () => import('../pages//UserRegister.vue'),
+    meta: { requiresAuth: true, roles: ['ADMIN'] },
   },
   {
-    name:"使用者管理",
+    name: '審核列表',
+    path: '/user/verified/check',
+    component: () => import('../pages/VerifiedCheck.vue'),
+    meta: { requiresAuth: true, roles: ['ADMIN', 'STAFF'] },
+  },
+  { name: '註冊', path: '/register', component: () => import('../pages//UserRegister.vue') },
+  {
+    name: '使用者管理',
     path: '/user/manage',
     component: () => import('../pages/UserManage.vue'),
   },

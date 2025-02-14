@@ -72,9 +72,10 @@ const onSubmit = async () => {
 
     LocalStorage.set('userId', payload.userId)
     LocalStorage.set('userName', payload.userName)
+    LocalStorage.set('roles', JSON.stringify(payload.roles))
 
     alert('登入成功')
-    authStore.login(data.data); // ✅ 透過 Pinia 設定登入狀態
+    authStore.login(data.data, payload.roles);
 
     router.push({ name: '使用者管理' })
 

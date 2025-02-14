@@ -21,10 +21,34 @@
 
               <!-- 驗證狀態 -->
               <div class="text-center q-mt-lg">
-                <q-chip :color="user.userIsVerified ? 'positive' : 'negative'" text-color="white" class="status-chip">
-                  <q-icon :name="user.userIsVerified ? 'verified' : 'gpp_bad'" class="q-mr-sm" />
-                  {{ user.userIsVerified ? '已驗證帳號' : '未驗證帳號' }}
-                </q-chip>
+                <!-- 已驗證狀態 -->
+                <template v-if="user.userIsVerified">
+                  <q-chip color="positive" text-color="white" class="status-chip">
+                    <q-icon name="verified" class="q-mr-sm" />
+                    已驗證帳號
+                  </q-chip>
+                </template>
+
+                <!-- 未驗證狀態 -->
+                <template v-else>
+                  <div class="row q-gutter-sm justify-center">
+                    <q-btn color="warning" class="status-chip" @click="handleVerification" :loading="verifying">
+                      <q-icon name="gpp_bad" class="q-mr-sm" />
+                      申請帳號驗證
+                    </q-btn>
+                    <q-btn color="info" class="status-chip" @click="checkVerificationStatus">
+                      <q-icon name="search" class="q-mr-sm" />
+                      查詢審核狀態
+                    </q-btn>
+                  </div>
+                </template>
+                <div class="q-mt-md">
+                  <span class="text-weight-bold">當前權限：</span>
+                  <q-chip v-for="role in authStore.roles" :key="role" :color="getRoleColor(role)" text-color="white"
+                    class="q-mx-xs">
+                    {{ role }}
+                  </q-chip>
+                </div>
               </div>
             </div>
           </div>
@@ -42,7 +66,7 @@
               <q-form @submit="saveUserInfo" class="q-gutter-md">
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-sm-6">
-                    <q-input v-model="user.userName" label="用戶名稱" outlined dense>
+                    <q-input v-model="user.userName" label="用戶名稱" outlined dense disabled>
                       <template v-slot:prepend>
                         <q-icon name="person" />
                       </template>
@@ -147,6 +171,54 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- 審核狀態對話框 -->
+    <q-dialog v-model="statusDialog">
+      <q-card style="min-width: 400px">
+        <q-card-section class="row items-center">
+          <div class="text-h6">
+            <q-icon name="fact_check" class="q-mr-sm" />
+            審核狀態查詢
+          </div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <div class="q-pa-md">
+            <!-- 申請編號 -->
+            <div class="row items-center q-mb-md">
+              <q-icon name="tag" class="q-mr-sm" />
+              <span class="text-weight-medium">申請編號：</span>
+              <span class="q-ml-sm">#{{ verificationStatus.requestId }}</span>
+            </div>
+
+            <!-- 申請時間 -->
+            <div class="row items-center q-mb-md">
+              <q-icon name="event" class="q-mr-sm" />
+              <span class="text-weight-medium">申請時間：</span>
+              <span class="q-ml-sm">{{ formatDateTime(verificationStatus.requestAt) }}</span>
+            </div>
+
+            <!-- 審核狀態 -->
+            <div class="row items-center q-mb-md">
+              <q-icon name="pending" class="q-mr-sm" />
+              <span class="text-weight-medium">審核狀態：</span>
+              <q-chip :color="getStatusColor(verificationStatus.status)" text-color="white" class="q-ml-sm">
+                {{ verificationStatus.status }}
+              </q-chip>
+            </div>
+
+            <!-- 審核意見（如果有） -->
+            <div class="row items-center" v-if="verificationStatus.comments">
+              <q-icon name="comment" class="q-mr-sm" />
+              <span class="text-weight-medium">審核意見：</span>
+              <span class="q-ml-sm">{{ verificationStatus.comments }}</span>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -155,6 +227,8 @@ import { ref, onMounted } from 'vue'
 import { api } from '../boot/axios'
 import { LocalStorage } from 'quasar'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/autoStore'
+
 const router = useRouter()
 const userName = ref('ruka')
 const user = ref({})
@@ -165,6 +239,16 @@ const historyRecords = ref([])
 const currentPage = ref(1)
 const pageSize = ref(5)
 const totalPages = ref(1)
+const verifying = ref(false)
+const statusDialog = ref(false)
+const verificationStatus = ref({
+  requestId: '',
+  requestAt: '',
+  status: '',
+  comments: ''
+})
+
+const authStore = useAuthStore(); // ✅ 使用 Pinia
 
 const fetchUser = async () => {
   try {
@@ -250,6 +334,43 @@ const handlePageChange = async (page) => {
   await fetchHistoryRecords()
 }
 
+// 處理驗證申請
+const handleVerification = async () => {
+  try {
+    verifying.value = true
+    await api.get("/users/verified")
+    alert('驗證申請已送出，請等待審核！')
+  } catch (error) {
+    console.error('驗證申請失敗:', error)
+    alert('驗證申請失敗，請稍後再試')
+  } finally {
+    verifying.value = false
+  }
+}
+
+
+// 查詢審核狀態
+const checkVerificationStatus = async () => {
+  try {
+    const { data } = await api.get('/users/verified/status')
+    console.log('API回傳資料:', data.data) // 檢查資料
+    verificationStatus.value = data.data
+    statusDialog.value = true  // 打開對話框
+  } catch (error) {
+    console.error('查詢審核狀態失敗:', error)
+    alert('查詢審核狀態失敗，請稍後再試')
+  }
+}
+
+// 獲取狀態顏色
+const getStatusColor = (status) => {
+  switch (status) {
+    case '審核中': return 'warning'
+    case '已通過': return 'positive'
+    case '已拒絕': return 'negative'
+    default: return 'grey'
+  }
+}
 
 // 初始化
 onMounted(() => {
@@ -263,6 +384,7 @@ onMounted(() => {
 })
 
 const formatDateTime = (dateString) => {
+  if (!dateString) return '無資料';
   const date = new Date(dateString);
   return date.toLocaleString('zh-TW', {
     year: 'numeric',
@@ -273,7 +395,14 @@ const formatDateTime = (dateString) => {
     second: '2-digit'
   });
 };
-
+const getRoleColor = (role) => {
+  switch (role) {
+    case 'ADMIN': return 'red';
+    case 'STAFF': return 'orange';
+    case 'USER': return 'blue';
+    default: return 'grey';
+  }
+};
 </script>
 
 <style scoped>
@@ -325,5 +454,14 @@ const formatDateTime = (dateString) => {
   .profile-right-section {
     padding: 10px;
   }
+}
+
+/* 添加一些動畫效果 */
+.q-dialog-plugin {
+  transition: all 0.3s ease;
+}
+
+.q-chip {
+  transition: background-color 0.3s ease;
 }
 </style>

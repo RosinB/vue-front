@@ -8,75 +8,28 @@
 
       <q-form @submit.prevent="register" class="q-gutter-md">
         <q-card-section>
-          <q-input
-            filled
-            v-model="userForm.userName"
-            label="帳號"
-            bottom-slots
-            :rules="[val=>!!val||'帳號為必填']"
-          />
+          <q-select filled v-model="userForm.userType" label="用戶類型" :options="['管理員', '員工', '會員']" bottom-slots />
+          <q-input filled v-model="userForm.userName" label="帳號" bottom-slots :rules="[val => !!val || '帳號為必填']" />
 
-          <q-input
-            filled
-            v-model="userForm.userPwd"
-            type="password"
-            label="密碼"
-            :rules="[val => !!val || '密碼為必填']"
-            bottom-slots
-          />
+          <q-input filled v-model="userForm.userPwd" type="password" label="密碼" :rules="[val => !!val || '密碼為必填']"
+            bottom-slots />
 
-          <q-input
-            filled
-            v-model="userForm.userEmail"
-            type="email"
-            label="Email"
-            :rules="[val => !!val || 'Email 為必填']"
-            bottom-slots
-          />
+          <q-input filled v-model="userForm.userEmail" type="email" label="Email" :rules="[val => !!val || 'Email 為必填']"
+            bottom-slots />
 
-          <q-input
-            filled
-            v-model="userForm.userBirthDate"
-            type="date"
-            label="生日"
-            :rules="[val => !!val || '請選擇生日']"
-            bottom-slots
-          />
+          <q-input filled v-model="userForm.userBirthDate" type="date" label="生日" :rules="[val => !!val || '請選擇生日']"
+            bottom-slots />
 
-          <q-input
-            filled
-            v-model="userForm.userPhone"
-            type="tel"
-            label="手機號碼"
-            :rules="[val => !!val || '手機號碼必填']"
-            bottom-slots
-          />
+          <q-input filled v-model="userForm.userPhone" type="tel" label="手機號碼" :rules="[val => !!val || '手機號碼必填']"
+            bottom-slots />
 
-          <q-input
-            filled
-            v-model="userForm.userIdCard"
-            label="身分證字號"
-            :rules="[val => !!val || '身分證字號必填']"
-            bottom-slots
-          />
-          <q-btn
-          @click="showUploadDialog = true"
-          color="secondary"
-          push
-          label="批次註冊"
-          class="q-mt-sm"
-        />
+          <q-input filled v-model="userForm.userIdCard" label="身分證字號" :rules="[val => !!val || '身分證字號必填']"
+            bottom-slots />
+          <q-btn @click="showUploadDialog = true" color="secondary" push label="批次註冊" class="q-mt-sm" />
         </q-card-section>
 
         <q-card-actions align="center">
-          <q-btn
-            type="submit"
-            color="primary"
-            class="full-width"
-            size="lg"
-            label="註冊"
-            style="margin-top: -20px;"
-          />
+          <q-btn type="submit" color="primary" class="full-width" size="lg" label="註冊" style="margin-top: -20px;" />
 
         </q-card-actions>
       </q-form>
@@ -91,15 +44,9 @@
           </q-card-section>
 
           <q-card-section>
-            <q-file
-              v-model="excelFile"
-              label="上傳 Excel 檔案"
-              filled
-              accept=".xlsx, .xls"
-              @update:model-value="parseExcel"
-              hint="請上傳包含必要欄位的 Excel 檔案"
-            >
-            <!-- 這是插槽 可以塞圖片 -->
+            <q-file v-model="excelFile" label="上傳 Excel 檔案" filled accept=".xlsx, .xls" @update:model-value="parseExcel"
+              hint="請上傳包含必要欄位的 Excel 檔案">
+              <!-- 這是插槽 可以塞圖片 -->
               <template v-slot:append>
                 <q-icon name="upload_file" />
               </template>
@@ -108,32 +55,20 @@
             <!-- 預覽數據 -->
             <div v-if="showPreview" class="q-mt-md">
               <div class="text-subtitle1 q-mb-sm">預覽數據 (共 {{ previewData.length }} 筆)</div>
-              <q-table
-                :rows="previewData"
-                :columns="[
-                  { name: 'userName', label: '帳號', field: 'userName' },
-                  { name: 'userEmail', label: 'Email', field: 'userEmail' },
-                  { name: 'userPhone', label: '手機號碼', field: 'userPhone' },
-                  { name: 'userIdCard', label: '身分證字號', field: 'userIdCard' },
-                  { name: 'userBirthDate', label: '生日', field: 'userBirthDate' }
-                ]"
-                dense
-                :rows-per-page-options="[5]"
-                :pagination="{ rowsPerPage: 5 }"
-              />
+              <q-table :rows="previewData" :columns="[
+                { name: 'userName', label: '帳號', field: 'userName' },
+                { name: 'userEmail', label: 'Email', field: 'userEmail' },
+                { name: 'userPhone', label: '手機號碼', field: 'userPhone' },
+                { name: 'userIdCard', label: '身分證字號', field: 'userIdCard' },
+                { name: 'userBirthDate', label: '生日', field: 'userBirthDate' }
+              ]" dense :rows-per-page-options="[5]" :pagination="{ rowsPerPage: 5 }" />
             </div>
           </q-card-section>
 
           <q-card-actions align="right">
             <q-btn flat label="取消" color="primary" v-close-popup />
-            <q-btn
-              flat
-              label="確認上傳"
-              color="primary"
-              @click="uploadData"
-              :disable="!previewData.length"
-              :loading="uploading"
-            />
+            <q-btn flat label="確認上傳" color="primary" @click="uploadData" :disable="!previewData.length"
+              :loading="uploading" />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -157,7 +92,8 @@ const userForm = ref({
   userPhone: '',
   userEmail: '',
   userIdCard: '',
-  userBirthDate: ''
+  userBirthDate: '',
+  userType: ''
 })
 
 // 批次註冊相關
@@ -221,7 +157,7 @@ const uploadData = async () => {
   uploading.value = true
   try {
     console.log('批次註冊數據:', previewData.value)
-    const {data} = await api.post('/users/batchAddUser', previewData.value)
+    const { data } = await api.post('/users/batchAddUser', previewData.value)
     console.log('批次註冊回應:', data.data)
     alert(`批次註冊成功！共註冊 ${previewData.value.length} 筆資料`)
     router.push('/user/all')
